@@ -38,6 +38,7 @@ def change_lsb(color, binary, index):
         modified = list(bin(color)[2:].zfill(8))
         modified[-1] = binary[index]
         modified = int(''.join(modified), 2)
+        print("Changed {} to {}".format(color, modified))
         return modified
     else:
         return color
@@ -49,24 +50,24 @@ def encode(clip, file_to_hide):
     filesize = os.path.getsize(file_to_hide) * 8
     frames = []
     [frames.append(frame) for frame in clip.iter_frames(dtype="uint8")]
-
     # This takes forever. In the sample there's 450+ frames and we go through
     # each and every pixel in each frame. There should be a better way to do it?
-    for frame in frames:
-        for i1, pixels in enumerate(frame):
-            for i2, pixel in enumerate(pixels):
-                frame[i1][i2] = process_pixel(pixel, file_binary, i2 * 3, filesize)
+    for i1, frame in enumerate(frames):
+        for i2, pixels in enumerate(frame):
+            for i3, pixel in enumerate(pixels):
+                frames[i1][i2][i3] = process_pixel(pixel, file_binary, i3 * 3, filesize)
                 filesize -= 3
                 if(filesize <= 0):
                     return frames
 
 
 def main():
-    clip = mpy.VideoFileClip('Samples/lee.webm')
+    clip = mpy.VideoFileClip('Sample/lee.webm')
     file_to_hide = 'Samples/hidethis.txt'
     frames = encode(clip, file_to_hide)
     output = mpy.ImageSequenceClip(frames, fps=clip.fps)
-    output.write_videofile("output.webm", codec="libvpx", bitrate="5000k")
+    output.write_videofile("output.webm", codec="libvpx", bitrate="50000k")
+
 
 if __name__ == '__main__':
     main()
