@@ -62,7 +62,7 @@ def encode(clip, file_to_hide):
 
 
 def main():
-    clip = mpy.VideoFileClip('Sample/lee.webm')
+    clip = mpy.VideoFileClip('Samples/lee.webm')
     file_to_hide = 'Samples/hidethis.txt'
     frames = encode(clip, file_to_hide)
     output = mpy.ImageSequenceClip(frames, fps=clip.fps)
