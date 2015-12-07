@@ -4,6 +4,7 @@ Simple video stegaenograpy application written in Python
 Requirements
 ============
 Python version 2.6+
+
 MoviePy (http://zulko.github.io/moviepy/)
 
 > Can be installed with `pip install MoviePy`
@@ -24,6 +25,7 @@ Encode
 
 
 Decode:
+
     usage: Python video stego [-h] video
 
     positional arguments:
