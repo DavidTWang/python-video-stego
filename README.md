@@ -1,5 +1,5 @@
 # python-video-stego
-Simple video stegaenograpy application written in Python
+Simple video steganography application written in Python
 
 Requirements
 ============
