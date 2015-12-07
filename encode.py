@@ -2,6 +2,7 @@ import moviepy.editor as mpy
 import os
 import binascii
 import base64
+import argparse
 from Crypto.Cipher import AES
 MASTER_KEY = "CorrectHorseBatteryStapleGunHead"
 
@@ -27,17 +28,6 @@ def file_to_binary(file):
 
 def str_to_binary(string):
     return ''.join(format(ord(c), 'b').zfill(8) for c in string)
-
-
-def process_pixel(pixel, file_binary, index, bits_left):
-    color = 0
-    rgb = [pixel[0], pixel[1], pixel[2]]
-    for color in range(3):
-        rgb[color] = change_lsb(pixel[color], file_binary, index + color)
-        bits_left -= 1
-        if(bits_left == 0):
-            break
-    return (rgb[0], rgb[1], rgb[2])
 
 
 def get_lsb(color):
@@ -73,6 +63,17 @@ def compare(clip1, clip2):
                 print("Original: {}, Modified: {}".format(pixel1, pixel2))
 
 
+def process_pixel(pixel, file_binary, index, bits_left):
+    color = 0
+    rgb = [pixel[0], pixel[1], pixel[2]]
+    for color in range(3):
+        rgb[color] = change_lsb(pixel[color], file_binary, index + color)
+        bits_left -= 1
+        if(bits_left == 0):
+            break
+    return (rgb[0], rgb[1], rgb[2])
+
+
 def encode(clip, file_binary):
     frames = []
     [frames.append(frame) for frame in clip.iter_frames(dtype="uint8")]
@@ -91,12 +92,11 @@ def encode(clip, file_binary):
 
 
 def main():
-    clip = mpy.VideoFileClip('Samples/lee.webm')
+    clip = mpy.VideoFileClip(args.video)
 
-    file_to_hide = 'Samples/finalproj.pdf'
-    file = open(file_to_hide, 'rb')
-    filesize = os.path.getsize(file_to_hide)
-    file_header = os.path.basename(file_to_hide) + "\0" + str(filesize) + "\0"
+    file = open(args.hide, 'rb')
+    filesize = os.path.getsize(args.hide)
+    file_header = os.path.basename(args.hide) + "\0" + str(filesize) + "\0"
     file_binary = str_to_binary(file_header) + ''.join(file_to_binary(file))
 
     frames = encode(clip, file_binary)
@@ -104,11 +104,10 @@ def main():
     output = mpy.ImageSequenceClip(frames, fps=clip.fps)
     output.write_videofile("output.avi", codec="png")
 
-    # new_frames = encode(verify, file_to_hide)
-    # clip = mpy.VideoFileClip('Samples/lee.webm')
-    # verify = mpy.VideoFileClip('output.avi')
-    # compare(clip, verify)
-
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser("Python video stego")
+    parser.add_argument("video", help="Video file to use")
+    parser.add_argument("hide", help="File to be hidden within")
+    args = parser.parse_args()
     main()

@@ -1,6 +1,7 @@
 import moviepy.editor as mpy
 import binascii
 import base64
+import argparse
 from Crypto.Cipher import AES
 from math import ceil
 MASTER_KEY = "CorrectHorseBatteryStapleGunHead"
@@ -45,6 +46,7 @@ def decode(clip):
     filename, filesize, frames_needed = analyze_header(clip)
     print(filename, filesize, frames_needed)
     for num, frame in enumerate(clip.iter_frames(dtype="uint8")):
+        print("Processing frame {} of {}...".format(num+1, frames_needed))
         for pixels in frame:
             for pixel in pixels:
                 for color in pixel:
@@ -57,10 +59,12 @@ def decode(clip):
 def main():
     clip = mpy.VideoFileClip('output.avi')
     filename, filesize, data = decode(clip)
-    print(data[:int(filesize)])
     with open(filename, 'wb') as f:
         f.write(data[:int(filesize)])
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser("Python video stego")
+    parser.add_argument("video", help="Video file to use")
+    args = parser.parse_args()
     main()
